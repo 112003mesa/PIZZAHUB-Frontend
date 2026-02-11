@@ -104,6 +104,8 @@ const Cart = () => {
       totalAmount: total
       };
 
+    if(payment === 'card') return toast.error('Payment method not supported yet');
+
       // مثال لإرسال البيانات للباك اند
     await api.post('/orders/create', orderPayload);
     toast.success('Order placed successfully! 🚀');

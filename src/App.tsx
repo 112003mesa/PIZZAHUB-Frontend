@@ -12,7 +12,6 @@ import DeliveryDashboard from "./pages/delivery/DeliveryDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import MenuPage from "./pages/user/MenuPage";
 import Orders from "./pages/user/Orders";
-import Profile from "./pages/user/Profile";
 import Cart from "./pages/user/Cart";
 import OrdersAdmin from "./pages/admin/OrdersAdmin";
 import ProductsAdmin from "./pages/admin/ProductsAdmin";
@@ -56,7 +55,6 @@ function App() {
           <Route index element={<UserDashboard />} />
           <Route path="menu" element={<MenuPage />} />
           <Route path="orders" element={<Orders />} />
-          <Route path="profile" element={<Profile />} />
           <Route path="cart" element={<Cart />} />
         </Route>
 

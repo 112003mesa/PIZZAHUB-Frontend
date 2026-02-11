@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { 
   FiPackage, FiTruck, FiCheckCircle, FiClock, 
-  FiSearch, FiEye, FiMoreVertical, FiDownload 
+  FiSearch, FiDownload 
 } from "react-icons/fi";
 import type { LatestOrder } from "../../type";
 import api from "../../api/axios";
 import Loading3D from "../../components/Loading3D.tsx";
+import { IoTrashOutline } from "react-icons/io5";
+import toast from "react-hot-toast";
 
 // --- Components الصغير لضمان Clean Code ---
 const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
@@ -27,20 +29,19 @@ const OrdersAdmin: React.FC = () => {
   const [orders, setOrders] = useState<LatestOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      // تم تعديل المسار ليتوافق مع الـ Base URL الموجود في الـ axios instance
+      const response = await api.get("/orders"); 
+      setOrders(response.data);
+    } catch (error) {
+      console.error("Fetch Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        setLoading(true);
-        // تم تعديل المسار ليتوافق مع الـ Base URL الموجود في الـ axios instance
-        const response = await api.get("/orders"); 
-        setOrders(response.data);
-      } catch (error) {
-        console.error("Fetch Error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchOrders();
   }, []);
 
@@ -58,6 +59,16 @@ const OrdersAdmin: React.FC = () => {
     pending: orders.filter(o => o.status === "pending").length,
     inTransit: orders.filter(o => o.status === "on_the_way").length,
     completed: orders.filter(o => o.status === "delivered").length,
+  };
+
+  const handleDeleteOrder = async (orderId: string) => {
+    try {
+      await api.delete(`/orders/delete/${orderId}`);
+      fetchOrders();
+      toast.success("Order deleted successfully");
+    } catch (error) {
+      console.log(error)
+    }
   };
 
 
@@ -139,13 +150,10 @@ const OrdersAdmin: React.FC = () => {
                     <span className="text-sm font-black text-slate-900">${order.totalAmount.toFixed(2)}</span>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="p-2 hover:bg-white rounded-lg border border-slate-200 text-slate-400 hover:text-indigo-600 shadow-sm transition-all">
-                        <FiEye size={16} />
-                      </button>
-                      <button className="p-2 hover:bg-white rounded-lg border border-slate-200 text-slate-400 hover:text-slate-900 shadow-sm transition-all">
-                        <FiMoreVertical size={16} />
-                      </button>
+                    <div className="flex justify-end gap-2">
+                    <button type="button" onClick={() => handleDeleteOrder(order._id)} className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded transition">
+                      <IoTrashOutline />
+                    </button>
                     </div>
                   </td>
                 </tr>
